@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>World Clock UI</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brandOrange: '#dd3f00' }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-brandOrange dark:bg-gray-900 transition-colors duration-500 flex flex-col items-center justify-between">
+
+  <main class="flex-1 flex items-center justify-center w-full p-6">
+    <div class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 transition-colors duration-500">
+      
+      <!-- Header: Logo + Toggles -->
+      <div class="flex items-center justify-between mb-6">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <img src="/clock_ui/pics/admin_logo.png" alt="Logo" class="w-10 h-10 rounded-full shadow">
+          <span class="font-bold text-lg text-black dark:text-white">World Clock</span>
+        </div>
+        
+        <!-- Controls -->
+        <div class="flex items-center gap-3">
+          <button id="btn12" class="py-2 px-4 rounded-full border bg-white text-black dark:bg-gray-700 dark:text-gray-200">12h</button>
+          <button id="btn24" class="py-2 px-4 rounded-full border bg-black text-white">24h</button>
+          <select id="location" class="rounded-xl border px-3 py-2 bg-white dark:bg-gray-700 dark:text-white">
+            <option value="Europe/London">London</option>
+            <option value="America/New_York">New York</option>
+            <option value="America/Los_Angeles">Los Angeles</option>
+            <option value="Europe/Paris">Paris</option>
+            <option value="Asia/Tokyo">Tokyo</option>
+            <option value="Asia/Tashkent">Tashkent</option>
+            <option value="Asia/Dubai">Dubai</option>
+            <option value="Australia/Sydney">Sydney</option>
+            <option value="Asia/Singapore">Singapore</option>
+            <option value="Europe/Istanbul">Istanbul</option>
+          </select>
+          <button id="dark-toggle" class="px-3 py-2 rounded-xl bg-gray-200 dark:bg-gray-600 text-black dark:text-white">🌙</button>
+        </div>
+      </div>
+
+      <!-- Big Clock -->
+      <div class="flex flex-wrap items-start justify-between gap-6">
+        <div class="flex-1">
+          <div class="select-none">
+            <div id="big-time" class="text-[6rem] sm:text-[7rem] font-extrabold text-black dark:text-white leading-none">00:00</div>
+          </div>
+          <div id="date-info" class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading…</div>
+        </div>
+        <div class="w-1/3 text-right text-gray-500 dark:text-gray-400 hidden sm:block">
+          Life moves fast. Stay on time and enjoy every moment!
+        </div>
+      </div>
+
+      <hr class="my-6 border-t border-gray-200 dark:border-gray-600">
+
+      <!-- Subtitle -->
+      <h2 id="city-title" class="text-3xl font-semibold text-black dark:text-white">London, United Kingdom</h2>
+
+      <!-- City cards -->
+      <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="cities-grid"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-4 text-center text-sm text-white dark:text-gray-300">
+    © Pirmaxmatov 2025 — Terms of Use
+  </footer>
+
+  <script>
+    const MAIN_SELECT = document.getElementById('location');
+    const BIG_TIME = document.getElementById('big-time');
+    const DATE_INFO = document.getElementById('date-info');
+    const CITY_TITLE = document.getElementById('city-title');
+    const GRID = document.getElementById('cities-grid');
+    const BTN12 = document.getElementById('btn12');
+    const BTN24 = document.getElementById('btn24');
+    const DARK_BTN = document.getElementById('dark-toggle');
+
+    let use24 = true;
+    let currentTZ = MAIN_SELECT.value;
+
+    const CITIES = [
+      { name: 'Los Angeles', tz: 'America/Los_Angeles' },
+      { name: 'New York', tz: 'America/New_York' },
+      { name: 'London', tz: 'Europe/London' },
+      { name: 'Paris', tz: 'Europe/Paris' },
+      { name: 'Tokyo', tz: 'Asia/Tokyo' },
+      { name: 'Tashkent', tz: 'Asia/Tashkent' },
+      { name: 'Dubai', tz: 'Asia/Dubai' },
+      { name: 'Sydney', tz: 'Australia/Sydney' },
+      { name: 'Singapore', tz: 'Asia/Singapore' },
+      { name: 'Istanbul', tz: 'Europe/Istanbul' }
+    ];
+
+    function formatTime(d, tz, sec = true) {
+      return new Intl.DateTimeFormat('en-GB', {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: sec ? '2-digit' : undefined,
+        hour12: !use24
+      }).format(d);
+    }
+
+    function getHour(d, tz) {
+      const opts = { timeZone: tz, hour: '2-digit', hour12: false };
+      const parts = new Intl.DateTimeFormat('en-GB', opts).formatToParts(d);
+      return Number(parts.find(p => p.type === 'hour').value);
+    }
+
+    function renderCities(now) {
+      GRID.innerHTML = '';
+      CITIES.forEach(city => {
+        const timeStr = formatTime(now, city.tz);
+        const hour = getHour(now, city.tz);
+        const isDay = hour >= 6 && hour < 19;
+        const isMain = city.tz === currentTZ;
+        const card = document.createElement('div');
+        card.className = `rounded-2xl p-5 border flex flex-col justify-between transition-colors duration-500 ${isMain ? 'bg-black text-white' : 'bg-gray-50 dark:bg-gray-700 text-black dark:text-white'}`;
+        card.innerHTML = `
+          <div class="font-medium">${city.name}</div>
+          <div class="text-2xl font-semibold mt-3">${timeStr}</div>
+          <div class="mt-2 text-sm flex items-center gap-2">
+            <span>${isDay ? '☀️' : '🌙'}</span>
+            <span class="${isMain ? 'text-gray-200' : 'text-gray-500 dark:text-gray-300'}">${isDay ? 'Day' : 'Night'}</span>
+          </div>
+        `;
+        GRID.appendChild(card);
+      });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      BIG_TIME.textContent = formatTime(now, currentTZ);
+      DATE_INFO.textContent = new Intl.DateTimeFormat('en-GB', {
+        timeZone: currentTZ,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }).format(now);
+      const cityName = MAIN_SELECT.options[MAIN_SELECT.selectedIndex].text;
+      CITY_TITLE.textContent = `${cityName}`;
+      renderCities(now);
+    }
+
+    // Event listeners
+    BTN12.onclick = () => { use24 = false; BTN12.classList.add('bg-black','text-white'); BTN24.classList.remove('bg-black','text-white'); updateClock(); };
+    BTN24.onclick = () => { use24 = true; BTN24.classList.add('bg-black','text-white'); BTN12.classList.remove('bg-black','text-white'); updateClock(); };
+    MAIN_SELECT.onchange = () => { currentTZ = MAIN_SELECT.value; updateClock(); };
+    DARK_BTN.onclick = () => { document.documentElement.classList.toggle('dark'); };
+
+    // Start
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
