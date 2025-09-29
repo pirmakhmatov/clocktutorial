@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>World Clock UI</title>
+  <link rel="icon" type="image/png" href="pics/admin_logo.png">
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -18,24 +18,26 @@
     }
   </script>
 </head>
-<body class="min-h-screen bg-brandOrange dark:bg-gray-900 transition-colors duration-500 flex flex-col items-center justify-between">
+<body class="min-h-screen bg-brandOrange dark:bg-gray-900 transition-colors duration-500 flex flex-col">
 
-  <main class="flex-1 flex items-center justify-center w-full p-6">
-    <div class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 transition-colors duration-500">
+  <main class="flex-1 flex items-center justify-center w-full p-4 sm:p-6">
+    <div class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-4 sm:p-8 transition-colors duration-500">
       
-      <!-- Header: Logo + Toggles -->
-      <div class="flex items-center justify-between mb-6">
-        <!-- Logo -->
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row items-center sm:justify-between gap-4 mb-6"> 
+        <!-- Logo + Title -->
         <div class="flex items-center gap-3">
-          <img src="/clock_ui/pics/admin_logo.png" alt="Logo" class="w-10 h-10 rounded-full shadow">
+          <div class="relative group">
+            <img src="pics/admin_logo.png" alt="Logo" class="w-10 h-10 rounded-full shadow">
+          </div>
           <span class="font-bold text-lg text-black dark:text-white">World Clock</span>
         </div>
-        
+
         <!-- Controls -->
-        <div class="flex items-center gap-3">
-          <button id="btn12" class="py-2 px-4 rounded-full border bg-white text-black dark:bg-gray-700 dark:text-gray-200">12h</button>
-          <button id="btn24" class="py-2 px-4 rounded-full border bg-black text-white">24h</button>
-          <select id="location" class="rounded-xl border px-3 py-2 bg-white dark:bg-gray-700 dark:text-white">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button id="btn12" class="py-1.5 px-3 rounded-full border bg-white text-black dark:bg-gray-700 dark:text-gray-200 text-sm sm:text-base">12h</button>
+          <button id="btn24" class="py-1.5 px-3 rounded-full border bg-black text-white text-sm sm:text-base">24h</button>
+          <select id="location" class="rounded-xl border px-2 py-1.5 bg-white dark:bg-gray-700 dark:text-white text-sm sm:text-base">
             <option value="Europe/London">London</option>
             <option value="America/New_York">New York</option>
             <option value="America/Los_Angeles">Los Angeles</option>
@@ -47,35 +49,35 @@
             <option value="Asia/Singapore">Singapore</option>
             <option value="Europe/Istanbul">Istanbul</option>
           </select>
-          <button id="dark-toggle" class="px-3 py-2 rounded-xl bg-gray-200 dark:bg-gray-600 text-black dark:text-white">🌙</button>
+          <button id="dark-toggle" class="px-3 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-600 text-black dark:text-white text-sm sm:text-base">🌙</button>
         </div>
       </div>
 
       <!-- Big Clock -->
-      <div class="flex flex-wrap items-start justify-between gap-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div class="flex-1">
           <div class="select-none">
-            <div id="big-time" class="text-[6rem] sm:text-[7rem] font-extrabold text-black dark:text-white leading-none">00:00</div>
+            <div id="big-time" class="text-[3rem] sm:text-[6rem] md:text-[7rem] font-extrabold text-black dark:text-white leading-none">00:00</div>
           </div>
-          <div id="date-info" class="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading…</div>
+          <div id="date-info" class="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">Loading…</div>
         </div>
-        <div class="w-1/3 text-right text-gray-500 dark:text-gray-400 hidden sm:block">
-          Life moves fast. Stay on time and enjoy every moment!
+        <div class="sm:w-1/3 text-center sm:text-right text-gray-500 dark:text-gray-400 hidden sm:block">
+          - Life moves fast. Stay on time and enjoy every moment! -
         </div>
       </div>
 
       <hr class="my-6 border-t border-gray-200 dark:border-gray-600">
 
       <!-- Subtitle -->
-      <h2 id="city-title" class="text-3xl font-semibold text-black dark:text-white">London, United Kingdom</h2>
+      <h2 id="city-title" class="text-xl sm:text-3xl font-semibold text-black dark:text-white">London, United Kingdom</h2>
 
       <!-- City cards -->
-      <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="cities-grid"></div>
+      <div class="mt-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" id="cities-grid"></div>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="w-full py-4 text-center text-sm text-white dark:text-gray-300">
+  <footer class="w-full py-3 sm:py-4 text-center text-xs sm:text-sm text-white dark:text-gray-300">
     © Pirmaxmatov 2025 — Terms of Use
   </footer>
 
@@ -132,8 +134,8 @@
         card.className = `rounded-2xl p-5 border flex flex-col justify-between transition-colors duration-500 ${isMain ? 'bg-black text-white' : 'bg-gray-50 dark:bg-gray-700 text-black dark:text-white'}`;
         card.innerHTML = `
           <div class="font-medium">${city.name}</div>
-          <div class="text-2xl font-semibold mt-3">${timeStr}</div>
-          <div class="mt-2 text-sm flex items-center gap-2">
+          <div class="text-xl sm:text-2xl font-semibold mt-3">${timeStr}</div>
+          <div class="mt-2 text-xs sm:text-sm flex items-center gap-2">
             <span>${isDay ? '☀️' : '🌙'}</span>
             <span class="${isMain ? 'text-gray-200' : 'text-gray-500 dark:text-gray-300'}">${isDay ? 'Day' : 'Night'}</span>
           </div>
@@ -157,13 +159,11 @@
       renderCities(now);
     }
 
-    // Event listeners
     BTN12.onclick = () => { use24 = false; BTN12.classList.add('bg-black','text-white'); BTN24.classList.remove('bg-black','text-white'); updateClock(); };
     BTN24.onclick = () => { use24 = true; BTN24.classList.add('bg-black','text-white'); BTN12.classList.remove('bg-black','text-white'); updateClock(); };
     MAIN_SELECT.onchange = () => { currentTZ = MAIN_SELECT.value; updateClock(); };
     DARK_BTN.onclick = () => { document.documentElement.classList.toggle('dark'); };
 
-    // Start
     updateClock();
     setInterval(updateClock, 1000);
   </script>
