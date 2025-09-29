@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timer & Stopwatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white min-h-screen flex flex-col items-center justify-center gap-10 p-6">
+
+  <!-- TIMER -->
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-lg text-center transition">
+    <h1 class="text-3xl font-extrabold mb-6 text-brandOrange">⏱ Timer</h1>
+    
+    <div class="flex gap-3 justify-center mb-6">
+      <input type="number" id="hours" min="0" placeholder="hh" class="w-20 p-3 border-2 rounded-xl text-center bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-orange-500">
+      <input type="number" id="minutes" min="0" max="59" placeholder="mm" class="w-20 p-3 border-2 rounded-xl text-center bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-orange-500">
+      <input type="number" id="seconds" min="0" max="59" placeholder="ss" class="w-20 p-3 border-2 rounded-xl text-center bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-orange-500">
+    </div>
+
+    <!-- Ringtone select -->
+    <select id="ringtone" class="w-full p-3 border-2 rounded-xl mb-6 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-orange-500">
+      <option value="https://www.soundjay.com/button/beep-07.mp3">🔔 Classic Bell</option>
+      <option value="https://www.soundjay.com/button/beep-10.mp3">🎶 Soft Melody</option>
+      <option value="https://www.soundjay.com/button/beep-09.mp3">🚨 Digital Beep</option>
+    </select>
+
+    <div class="flex justify-center gap-4">
+      <button id="startTimer" class="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md hover:scale-105 transition">Start</button>
+      <button id="resetTimer" class="px-5 py-2 rounded-xl bg-gray-500 text-white font-semibold shadow-md hover:scale-105 transition">Reset</button>
+    </div>
+
+    <p id="timerDisplay" class="text-4xl font-bold mt-6 tracking-widest">00:00:00</p>
+  </div>
+
+  <!-- STOPWATCH -->
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-lg text-center transition">
+    <h1 class="text-3xl font-extrabold mb-6 text-green-500">⏲ Stopwatch</h1>
+
+    <p id="stopwatchDisplay" class="text-4xl font-bold mb-6 tracking-widest">00:00:00</p>
+
+    <div class="flex justify-center gap-4">
+      <button id="startStopwatch" class="px-5 py-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold shadow-md hover:scale-105 transition">Start</button>
+      <button id="pauseStopwatch" class="px-5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold shadow-md hover:scale-105 transition">Pause</button>
+      <button id="resetStopwatch" class="px-5 py-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold shadow-md hover:scale-105 transition">Reset</button>
+    </div>
+  </div>
+
+  <!-- AUDIO FILES -->
+  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="tickSound" loop>
+    <source src="https://www.soundjay.com/clock/clock-ticking-2.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="alarmSound"></audio>
+
+  <script>
+    // TIMER
+    let timerInterval;
+    document.getElementById("startTimer").onclick = () => {
+      clearInterval(timerInterval);
+      let h = parseInt(document.getElementById("hours").value) || 0;
+      let m = parseInt(document.getElementById("minutes").value) || 0;
+      let s = parseInt(document.getElementById("seconds").value) || 0;
+      let total = h*3600 + m*60 + s;
+
+      const ringtone = document.getElementById("ringtone").value;
+      const alarmSound = document.getElementById("alarmSound");
+      alarmSound.src = ringtone;
+
+      timerInterval = setInterval(() => {
+        if (total <= 0) {
+          clearInterval(timerInterval);
+          alarmSound.play();
+          return;
+        }
+        total--;
+        let hh = String(Math.floor(total / 3600)).padStart(2,"0");
+        let mm = String(Math.floor((total % 3600)/60)).padStart(2,"0");
+        let ss = String(total % 60).padStart(2,"0");
+        document.getElementById("timerDisplay").innerText = `${hh}:${mm}:${ss}`;
+      }, 1000);
+    };
+
+    document.getElementById("resetTimer").onclick = () => {
+      clearInterval(timerInterval);
+      document.getElementById("timerDisplay").innerText = "00:00:00";
+    };
+
+    // STOPWATCH
+    let stopwatchInterval, stopwatchTime = 0;
+    const stopwatchDisplay = document.getElementById("stopwatchDisplay");
+    const bgMusic = document.getElementById("bgMusic");
+    const tickSound = document.getElementById("tickSound");
+
+    function updateStopwatch() {
+      let hh = String(Math.floor(stopwatchTime / 3600)).padStart(2,"0");
+      let mm = String(Math.floor((stopwatchTime % 3600)/60)).padStart(2,"0");
+      let ss = String(stopwatchTime % 60).padStart(2,"0");
+      stopwatchDisplay.innerText = `${hh}:${mm}:${ss}`;
+    }
+
+    document.getElementById("startStopwatch").onclick = () => {
+      clearInterval(stopwatchInterval);
+      bgMusic.play();
+      tickSound.play();
+      stopwatchInterval = setInterval(() => {
+        stopwatchTime++;
+        updateStopwatch();
+      }, 1000);
+    };
+
+    document.getElementById("pauseStopwatch").onclick = () => {
+      clearInterval(stopwatchInterval);
+      bgMusic.pause();
+      tickSound.pause();
+    };
+
+    document.getElementById("resetStopwatch").onclick = () => {
+      clearInterval(stopwatchInterval);
+      stopwatchTime = 0;
+      updateStopwatch();
+      bgMusic.pause();
+      tickSound.pause();
+      bgMusic.currentTime = 0;
+      tickSound.currentTime = 0;
+    };
+
+    updateStopwatch();
+  </script>
+</body>
+</html>
