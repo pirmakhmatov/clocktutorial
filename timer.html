@@ -1,308 +1,147 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Timer & Stopwatch — World Clock</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timer & Stopwatch</title>
   <link rel="icon" type="image/png" href="pics/admin_logo.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
-      theme: { extend: { colors: { brandOrange: '#dd3f00' } } }
+      theme: {
+        extend: {
+          colors: {
+            brandOrange: '#dd3f00',
+            brandDark: '#1a1a1a'
+          }
+        }
+      }
     }
   </script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500 flex flex-col">
+<body class="min-h-screen bg-gradient-to-br from-brandOrange via-orange-400 to-yellow-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex flex-col transition-colors duration-500">
 
-  <main class="flex-1 flex items-start justify-center w-full p-4 sm:p-6">
-    <div class="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-5 sm:p-8 transition-colors duration-500">
-
-      <!-- Header -->
-      <div class="flex items-center justify-between gap-3 mb-6">
-        <div class="flex items-center gap-3">
-          <img src="pics/admin_logo.png" alt="Logo" class="w-10 h-10 rounded-full shadow">
-          <div>
-            <div class="font-bold text-lg text-black dark:text-white">Timer & Stopwatch</div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">Side-by-side, elegant controls</div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <a href="index.html"
-             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-700 border text-sm shadow hover:scale-[1.02] transition">
-            ← Back to Watch
-          </a>
-
-          <button id="dark-toggle" aria-label="Toggle dark" 
-            class="px-3 py-2 rounded-full bg-gray-200 dark:bg-gray-600 text-black dark:text-white shadow hover:scale-105 transition">
-            🌙
-          </button>
-        </div>
-      </div>
-
-      <!-- Side-by-side cards -->
-      <div class="flex flex-col md:flex-row gap-6">
-        <!-- TIMER CARD -->
-        <section class="flex-1 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg">
-          <h3 class="text-2xl font-semibold text-brandOrange mb-4">⏱ Timer</h3>
-
-          <div class="flex flex-wrap gap-3 items-center mb-4">
-            <input id="hours" type="number" min="0" placeholder="HH" class="w-20 p-3 rounded-xl border text-center bg-transparent" />
-            <input id="minutes" type="number" min="0" max="59" placeholder="MM" class="w-20 p-3 rounded-xl border text-center bg-transparent" />
-            <input id="seconds" type="number" min="0" max="59" placeholder="SS" class="w-20 p-3 rounded-xl border text-center bg-transparent" />
-          </div>
-
-          <label class="text-sm text-gray-600 dark:text-gray-300">Ringtone</label>
-          <select id="ringtone" class="w-full p-3 rounded-xl border mb-4 bg-transparent">
-            <option value="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3">🔔 Digital Beep</option>
-            <option value="https://assets.mixkit.co/sfx/preview/mixkit-discrete-door-bell-announcement-225.mp3">🔔 Door Chime</option>
-            <option value="https://assets.mixkit.co/sfx/preview/mixkit-game-notification-wave-alarm-987.mp3">🔔 Wave Alarm</option>
-            <option value="https://assets.mixkit.co/sfx/preview/mixkit-alarm-clock-beep-988.mp3">🔔 Classic Clock Ring</option>
-          </select>
-
-          <div class="flex items-center gap-3 mb-4">
-            <button id="startTimer" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow hover:scale-105 transition">Start</button>
-            <button id="pauseTimer" class="px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-black dark:text-white border">Pause</button>
-            <button id="resetTimer" class="px-4 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition">Reset</button>
-          </div>
-
-          <div class="text-center">
-            <div id="timerDisplay" class="text-[2.5rem] sm:text-[3rem] font-extrabold tracking-wider text-black dark:text-white">00:00:00</div>
-            <div class="mt-3 text-sm text-gray-500 dark:text-gray-300">When time ends, selected ringtone will play — use Stop Alarm to silence.</div>
-          </div>
-
-          <div class="mt-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <label class="text-sm text-gray-600 dark:text-gray-300">Volume</label>
-              <input id="ringVolume" type="range" min="0" max="1" step="0.01" value="0.9" class="w-40" />
-            </div>
-            <button id="stopAlarm" class="px-4 py-2 rounded-lg bg-gray-800 text-white hidden">Stop Alarm</button>
-          </div>
-        </section>
-
-        <!-- STOPWATCH CARD -->
-        <section class="flex-1 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg">
-          <h3 class="text-2xl font-semibold text-green-500 mb-3">⏲ Stopwatch</h3>
-
-          <div class="text-center mb-4">
-            <div id="stopwatchDisplay" class="text-[2.5rem] sm:text-[3rem] font-extrabold tracking-wider text-black dark:text-white">00:00:00</div>
-            <div class="mt-2 text-sm text-gray-500 dark:text-gray-300">Start to play calm background + tick sound.</div>
-          </div>
-
-          <div class="flex items-center gap-3 mb-4">
-            <button id="swStart" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold shadow hover:scale-105 transition">Start</button>
-            <button id="swPause" class="px-4 py-3 rounded-xl bg-yellow-400 text-white">Pause</button>
-            <button id="swReset" class="px-4 py-3 rounded-xl bg-red-500 text-white">Reset</button>
-          </div>
-
-          <div class="flex flex-col gap-3 mt-2">
-            <div class="flex items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <input id="bgMusicMute" type="checkbox" />
-                <label class="text-sm text-gray-600 dark:text-gray-300">Mute background music</label>
-              </div>
-              <input id="bgVolume" type="range" min="0" max="1" step="0.01" value="0.45" class="w-36" />
-            </div>
-
-            <div class="flex items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <input id="tickMute" type="checkbox" />
-                <label class="text-sm text-gray-600 dark:text-gray-300">Mute tick sound</label>
-              </div>
-              <input id="tickVolume" type="range" min="0" max="1" step="0.01" value="0.6" class="w-36" />
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div class="mt-6 text-xs text-gray-500 dark:text-gray-400">
-        Audio assets (ringtones / tick / music) are from Mixkit and SoundHelix (free assets). See credits below.
-      </div>
+  <!-- Header -->
+  <header class="p-4 flex justify-between items-center bg-white dark:bg-gray-800 shadow-md rounded-b-2xl">
+    <div class="flex items-center gap-3">
+      <img src="pics/admin_logo.png" class="w-10 h-10 rounded-full shadow" alt="logo">
+      <h1 class="font-bold text-xl text-black dark:text-white">Timer & Stopwatch</h1>
     </div>
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-700 text-sm text-black dark:text-white shadow hover:scale-105 transition">← Back</a>
+      <button id="dark-toggle" class="px-3 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-700 text-sm text-black dark:text-white shadow hover:scale-105 transition">🌙</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col md:flex-row gap-6 p-6 justify-center items-stretch">
+
+    <!-- TIMER -->
+    <section class="flex-1 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 flex flex-col items-center">
+      <h2 class="text-2xl font-bold text-black dark:text-white mb-6">⏳ Timer</h2>
+      <div class="flex gap-2 mb-4">
+        <input type="number" id="hours" placeholder="HH" class="w-16 text-center rounded-lg border p-2 dark:bg-gray-700 dark:text-white">
+        <input type="number" id="minutes" placeholder="MM" class="w-16 text-center rounded-lg border p-2 dark:bg-gray-700 dark:text-white">
+        <input type="number" id="seconds" placeholder="SS" class="w-16 text-center rounded-lg border p-2 dark:bg-gray-700 dark:text-white">
+      </div>
+      <select id="ringtone" class="rounded-xl border px-3 py-2 mb-6 dark:bg-gray-700 dark:text-white">
+        <option value="sound/ringtone1.mp3">Ringtone 1</option>
+        <option value="sound/ringtone2.mp3">Ringtone 2</option>
+        <option value="sound/ringtone3.mp3">Ringtone 3</option>
+      </select>
+      <div id="timer-display" class="text-5xl font-extrabold text-black dark:text-white mb-6">00:00:00</div>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button onclick="startTimer()" class="px-4 py-2 bg-black text-white rounded-lg shadow hover:scale-105 transition">Start</button>
+        <button onclick="stopTimer()" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:scale-105 transition">Stop</button>
+        <button onclick="resetTimer()" class="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:scale-105 transition">Reset</button>
+      </div>
+    </section>
+
+    <!-- STOPWATCH -->
+    <section class="flex-1 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 flex flex-col items-center">
+      <h2 class="text-2xl font-bold text-black dark:text-white mb-6">⏱ Stopwatch</h2>
+      <div id="stopwatch-display" class="text-5xl font-extrabold text-black dark:text-white mb-6">00:00:00</div>
+      <div class="flex flex-wrap justify-center gap-3 mb-6">
+        <button onclick="startStopwatch()" class="px-4 py-2 bg-black text-white rounded-lg shadow hover:scale-105 transition">Start</button>
+        <button onclick="stopStopwatch()" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:scale-105 transition">Stop</button>
+        <button onclick="resetStopwatch()" class="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:scale-105 transition">Reset</button>
+      </div>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button onclick="playBackground()" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:scale-105 transition">▶ Background</button>
+        <button onclick="stopBackground()" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:scale-105 transition">⏹ Stop Music</button>
+      </div>
+    </section>
   </main>
 
-  <footer class="w-full py-3 text-center text-xs text-gray-500 dark:text-gray-400">
-    © Pirmaxmatov 2025 — Terms of Use
+  <!-- Footer -->
+  <footer class="w-full py-3 text-center text-xs sm:text-sm text-white dark:text-gray-300 bg-black dark:bg-gray-800 rounded-t-2xl">
+    © Pirmaxmatov 2025 — Timer & Stopwatch
   </footer>
 
-  <!-- AUDIO ELEMENTS (online sources) -->
-  <audio id="alarmAudio" preload="auto" crossorigin="anonymous"></audio>
-  <audio id="bgMusic" preload="auto" crossorigin="anonymous" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="tickSound" preload="auto" crossorigin="anonymous" loop>
-    <source src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" type="audio/mpeg">
-  </audio>
-
+  <!-- Scripts -->
   <script>
-    // DARK MODE (persist)
-    const darkToggle = document.getElementById('dark-toggle');
-    function applySavedTheme() {
-      if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
-    }
-    applySavedTheme();
-    darkToggle.onclick = () => {
+    // Dark mode toggle
+    document.getElementById('dark-toggle').onclick = () => {
       document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
     };
 
-    /* ---------------- TIMER ---------------- */
-    const hInput = document.getElementById('hours');
-    const mInput = document.getElementById('minutes');
-    const sInput = document.getElementById('seconds');
-    const startBtn = document.getElementById('startTimer');
-    const pauseBtn = document.getElementById('pauseTimer');
-    const resetBtn = document.getElementById('resetTimer');
-    const display = document.getElementById('timerDisplay');
-    const ringtoneSelect = document.getElementById('ringtone');
-    const alarmAudio = document.getElementById('alarmAudio');
-    const ringVolume = document.getElementById('ringVolume');
-    const stopAlarmBtn = document.getElementById('stopAlarm');
+    // TIMER
+    let timerInterval, timerSound, tickTimer;
+    function startTimer() {
+      stopTimer();
+      let h = parseInt(document.getElementById('hours').value) || 0;
+      let m = parseInt(document.getElementById('minutes').value) || 0;
+      let s = parseInt(document.getElementById('seconds').value) || 0;
+      let total = h*3600 + m*60 + s;
+      const ringtone = document.getElementById('ringtone').value;
 
-    let timerTotal = 0;
-    let timerRemaining = 0;
-    let timerInterval = null;
-    let timerPaused = false;
+      tickTimer = new Audio("sound/tick.mp3");
 
-    function formatHMS(sec) {
-      const h = String(Math.floor(sec / 3600)).padStart(2,'0');
-      const m = String(Math.floor((sec % 3600)/60)).padStart(2,'0');
-      const s = String(sec % 60).padStart(2,'0');
-      return `${h}:${m}:${s}`;
-    }
-
-    startBtn.addEventListener('click', () => {
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      const h = parseInt(hInput.value) || 0;
-      const m = parseInt(mInput.value) || 0;
-      const s = parseInt(sInput.value) || 0;
-      timerTotal = h*3600 + m*60 + s;
-      if (timerTotal <= 0) { alert('Iltimos, haqiqiy vaqt kiriting (soat/dakika/soniya).'); return; }
-      timerRemaining = timerTotal;
-      // set ringtone
-      alarmAudio.src = ringtoneSelect.value;
-      alarmAudio.loop = true;
-      alarmAudio.volume = parseFloat(ringVolume.value);
-      // disable inputs while running
-      hInput.disabled = mInput.disabled = sInput.disabled = ringtoneSelect.disabled = true;
-      timerPaused = false;
       timerInterval = setInterval(() => {
-        if (!timerPaused) {
-          timerRemaining--;
-          display.textContent = formatHMS(timerRemaining);
-          if (timerRemaining <= 0) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            // play alarm (user initiated action: start button) - should be allowed
-            alarmAudio.currentTime = 0;
-            alarmAudio.play().catch(()=>{/* play maybe blocked until user interacts - in most browsers start already interacted */});
-            stopAlarmBtn.classList.remove('hidden');
-            hInput.disabled = mInput.disabled = sInput.disabled = ringtoneSelect.disabled = false;
-          }
+        if (total <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer-display').textContent = "00:00:00";
+          timerSound = new Audio(ringtone);
+          timerSound.play();
+        } else {
+          total--;
+          let hh = String(Math.floor(total/3600)).padStart(2,'0');
+          let mm = String(Math.floor((total%3600)/60)).padStart(2,'0');
+          let ss = String(total%60).padStart(2,'0');
+          document.getElementById('timer-display').textContent = `${hh}:${mm}:${ss}`;
+          tickTimer.play().catch(()=>{});
         }
       }, 1000);
-    });
-
-    pauseBtn.addEventListener('click', () => {
-      timerPaused = !timerPaused;
-      pauseBtn.textContent = timerPaused ? 'Resume' : 'Pause';
-    });
-
-    resetBtn.addEventListener('click', () => {
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-      timerPaused = false;
-      display.textContent = '00:00:00';
-      hInput.disabled = mInput.disabled = sInput.disabled = ringtoneSelect.disabled = false;
-      hInput.value = mInput.value = sInput.value = '';
-      stopAlarm(); // also stop any playing alarm
-    });
-
-    ringVolume.addEventListener('input', () => {
-      alarmAudio.volume = parseFloat(ringVolume.value);
-    });
-
-    stopAlarmBtn.addEventListener('click', stopAlarm);
-    function stopAlarm() {
-      if (!alarmAudio.paused) {
-        alarmAudio.pause();
-        alarmAudio.currentTime = 0;
-      }
-      stopAlarmBtn.classList.add('hidden');
     }
+    function stopTimer() { clearInterval(timerInterval); if (timerSound) timerSound.pause(); if(tickTimer) tickTimer.pause(); }
+    function resetTimer() { stopTimer(); document.getElementById('timer-display').textContent = "00:00:00"; }
 
-    /* -------------- STOPWATCH -------------- */
-    const swDisplay = document.getElementById('stopwatchDisplay');
-    const swStart = document.getElementById('swStart');
-    const swPause = document.getElementById('swPause');
-    const swReset = document.getElementById('swReset');
-    const bgMusic = document.getElementById('bgMusic');
-    const tickSound = document.getElementById('tickSound');
-    const bgMute = document.getElementById('bgMusicMute');
-    const tickMute = document.getElementById('tickMute');
-    const bgVol = document.getElementById('bgVolume');
-    const tickVol = document.getElementById('tickVolume');
-
-    let swInterval = null;
-    let swSeconds = 0;
-    let swRunning = false;
-
-    function renderSW() {
-      swDisplay.textContent = formatHMS(swSeconds);
-    }
-
-    swStart.addEventListener('click', () => {
-      if (swRunning) return;
-      swRunning = true;
-      // set volumes / mutes
-      bgMusic.volume = bgMute.checked ? 0 : parseFloat(bgVol.value);
-      tickSound.volume = tickMute.checked ? 0 : parseFloat(tickVol.value);
-      // Play (user interaction — allowed)
-      bgMusic.currentTime = 0;
-      tickSound.currentTime = 0;
-      bgMusic.play().catch(()=>{});
-      tickSound.play().catch(()=>{});
+    // STOPWATCH
+    let swInterval, swTime = 0, bgMusic, tick;
+    function startStopwatch() {
+      stopStopwatch();
+      tick = new Audio("sound/tick.mp3");
       swInterval = setInterval(() => {
-        swSeconds++;
-        renderSW();
+        swTime++;
+        let hh = String(Math.floor(swTime/3600)).padStart(2,'0');
+        let mm = String(Math.floor((swTime%3600)/60)).padStart(2,'0');
+        let ss = String(swTime%60).padStart(2,'0');
+        document.getElementById('stopwatch-display').textContent = `${hh}:${mm}:${ss}`;
+        tick.play().catch(()=>{});
       }, 1000);
-    });
+    }
+    function stopStopwatch() { clearInterval(swInterval); if(tick) tick.pause(); }
+    function resetStopwatch() { stopStopwatch(); swTime=0; document.getElementById('stopwatch-display').textContent="00:00:00"; }
 
-    swPause.addEventListener('click', () => {
-      if (!swRunning) return;
-      swRunning = false;
-      clearInterval(swInterval);
-      bgMusic.pause();
-      tickSound.pause();
-    });
-
-    swReset.addEventListener('click', () => {
-      swRunning = false;
-      clearInterval(swInterval);
-      swSeconds = 0;
-      renderSW();
-      bgMusic.pause();
-      tickSound.pause();
-      bgMusic.currentTime = tickSound.currentTime = 0;
-    });
-
-    // live volume/mute controls
-    bgVol.addEventListener('input', () => { if (!bgMute.checked) bgMusic.volume = parseFloat(bgVol.value); });
-    tickVol.addEventListener('input', () => { if (!tickMute.checked) tickSound.volume = parseFloat(tickVol.value); });
-    bgMute.addEventListener('change', () => { bgMusic.volume = bgMute.checked ? 0 : parseFloat(bgVol.value); });
-    tickMute.addEventListener('change', () => { tickSound.volume = tickMute.checked ? 0 : parseFloat(tickVol.value); });
-
-    // initial render
-    renderSW();
-    display.textContent = '00:00:00';
-
-    // stop music/tick when user navigates away (nice touch)
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        // optional: pause audio to save CPU/bandwidth
-        // bgMusic.pause(); tickSound.pause();
-      }
-    });
+    // Background music
+    function playBackground() {
+      bgMusic = new Audio("sound/background.mp3");
+      bgMusic.loop = true;
+      bgMusic.play();
+    }
+    function stopBackground() { if(bgMusic) bgMusic.pause(); }
   </script>
 </body>
 </html>
